@@ -21,38 +21,45 @@ export default function App() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
+
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
+
     return () => listener.subscription.unsubscribe();
   }, []);
 
   return (
-    <Router>
-      <header className="flex items-center justify-between">
+    <Router basename="/apero">
+      <header className="flex items-center justify-between p-4">
         <h1 className="text-3xl font-bold">🥖 Planches Apéro</h1>
         {session && (
-          <button onClick={() => supabase.auth.signOut()} className="text-sm underline">
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="text-sm underline"
+          >
             Se déconnecter
           </button>
         )}
       </header>
-      <nav className="flex items-center gap-4 mb-6">
-        <Link to="/" className="underline">Accueil</Link>
-        <Link to="/creer" className="underline">Créer une planche</Link>
-      </nav>
-      <main className="flex flex-col items-center">
 
+      <nav className="flex items-center gap-4 px-4 mb-6">
+        <Link to="/" className="underline">
+          Accueil
+        </Link>
+        <Link to="/creer" className="underline">
+          Créer une planche
+        </Link>
+      </nav>
+
+      <main className="flex flex-col items-center px-4">
         {!session ? (
           <Auth />
         ) : (
-          <>
-            
-            <Routes>
-              <Route path="/" element={<PlancheList session={session} />} />
-              <Route path="/creer" element={<CreatePlanche session={session} />} />
-            </Routes>
-          </>
+          <Routes>
+            <Route path="/" element={<PlancheList session={session} />} />
+            <Route path="/creer" element={<CreatePlanche session={session} />} />
+          </Routes>
         )}
       </main>
     </Router>
